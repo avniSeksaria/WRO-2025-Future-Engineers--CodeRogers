@@ -1,0 +1,91 @@
+#include <Servo.h>
+
+// Servo for steering
+Servo myServo;
+
+// Motor driver pins (L298N)
+int enA = 7;   // Enable pin (PWM speed control)
+int in1 = 6;   // Motor input 1
+int in2 = 5;   // Motor input 2
+
+// Ultrasonic Sensor pins
+int trigPin = 10;
+int echoPin = 9;
+
+// Distance threshold (cm)
+int distanceThreshold = 20;
+
+// Servo steering angles (adjust if needed)
+int straightAngle = 130;
+int leftAngle = 80;    // turn left
+int rightAngle = 180;  // turn right
+
+void setup() {
+  // Motor setup
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+
+  // Ultrasonic sensor setup
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  // Servo setup
+  myServo.attach(4);
+  myServo.write(straightAngle); // Center/straight
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  int distance = getDistance();
+
+  if (distance > distanceThreshold) {
+    // Safe → move forward
+    moveForward(200);
+    myServo.write(straightAngle); // keep straight
+  } else {
+    // Obstacle detected → stop and turn
+    stopMotor();
+    delay(200);
+
+    // Try turning left first
+    myServo.write(leftAngle);  
+    delay(500);
+    moveForward(200);
+    delay(800);
+
+    // straighten back
+    stopMotor();
+    myServo.write(straightAngle);
+    delay(300);
+  }
+}
+
+// Measure distance using ultrasonic
+int getDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  long duration = pulseIn(echoPin, HIGH);
+  int distance = duration * 0.034 / 2; // convert to cm
+  return distance;
+}
+
+// Motor forward
+void moveForward(int speedVal) {
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  analogWrite(enA, speedVal);
+}
+
+// Motor stop
+void stopMotor() {
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  analogWrite(enA, 0);
+}
