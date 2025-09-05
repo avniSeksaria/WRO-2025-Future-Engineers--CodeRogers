@@ -1,0 +1,15 @@
+1 3s 11.1v loop battery
+3	ultrasonic sensor HCSR04	
+2	Arduino Uno Rev 3
+1	electrical switch
+2     ESP32S3 Sense
+1	servo motor mg90s
+2	dc motor n20 250 RPM
+1     MPU-9250
+3	lm2596 buck converter
+
+1 Battery Connecter (Male + Female)
+Battery connecting Wire ( 1 meter)
+4 Loose wires for the project thick wire roll
+2 pcb
+1 copper wire roll(unsoldering)
